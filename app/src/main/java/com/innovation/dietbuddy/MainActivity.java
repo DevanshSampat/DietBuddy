@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
             Bitmap imageBitmap = BitmapFactory.decodeFile(filePath);
             ((ImageView) findViewById(R.id.iv_captured_photo)).setImageBitmap(imageBitmap);
         }
