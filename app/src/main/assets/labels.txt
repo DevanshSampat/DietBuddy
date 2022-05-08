@@ -1,0 +1,6 @@
+0 Beans
+1 Tomato
+2 Radish
+3 Carrot
+4 Capsicum
+5 Potato

@@ -36,13 +36,18 @@ public class SignInActivity extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
+        findViewById(R.id.btn_sign_in).setVisibility(View.INVISIBLE);
         findViewById(R.id.btn_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signIn();
             }
         });
-        signIn();
+        if(GoogleSignIn.getLastSignedInAccount(this)!=null) {
+            startActivity(new Intent(this,DashboardActivity.class));
+            finish();
+        }
+        else findViewById(R.id.btn_sign_in).setVisibility(View.VISIBLE);
     }
 
     private void signIn() {
@@ -77,7 +82,7 @@ public class SignInActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            startActivity(new Intent(SignInActivity.this,MainActivity.class));
+                            startActivity(new Intent(SignInActivity.this,DashboardActivity.class));
                             finish();
                         } else {
                             // If sign in fails, display a message to the user.
