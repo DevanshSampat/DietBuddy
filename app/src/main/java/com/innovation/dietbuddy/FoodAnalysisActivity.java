@@ -128,9 +128,7 @@ public class FoodAnalysisActivity extends AppCompatActivity {
             return;
         }
         if(getIntent().hasExtra("bitmap")) {
-            String encodedString = getIntent().getStringExtra("bitmap");
-            byte [] encodeByte= Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            Bitmap bitmap= BitmapFactory.decodeFile(new File(getFilesDir(),getIntent().getStringExtra("bitmap")).getPath());
             classify(bitmap);
         }
         else dispatchTakePictureIntent();

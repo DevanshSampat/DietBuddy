@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +34,9 @@ import com.innovation.dietbuddy.data.FoodData;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -190,13 +194,26 @@ public class DashboardActivity extends AppCompatActivity {
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] b = byteArrayOutputStream.toByteArray();
-                String dataToPut = Base64.encodeToString(b, Base64.DEFAULT);
+                String mimeType = getContentResolver().getType(uri);
+                File file = new File(getFilesDir(),"image."+mimeType.substring(mimeType.indexOf("/")+1));
+                if(!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 Intent intent = new Intent(DashboardActivity.this, FoodAnalysisActivity.class);
-                intent.putExtra("bitmap",dataToPut);
+                intent.putExtra("bitmap",file.getName());
                 startActivity(intent);
             }
         }super.onActivityResult(requestCode, resultCode, data);
