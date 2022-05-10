@@ -98,21 +98,41 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String searchText = charSequence.toString().toLowerCase();
-                if(searchText.replace(" ","").length()==0) {
-                    foodRecycler.setVisibility(View.GONE);
-                    return;
-                }
-                ArrayList<FoodData> filteredList = new ArrayList<>();
-                for(FoodData foodData: foodDataArrayList) {
-                    if(foodData.getName().toLowerCase().contains(searchText)) filteredList.add(foodData);
-                }
-                if(filteredList.size()==0) {
-                    foodRecycler.setVisibility(View.GONE);
-                    return;
-                }
-                foodAdapter.setFoodDataArrayList(filteredList);
-                foodRecycler.setVisibility(View.VISIBLE);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String searchText = charSequence.toString().toLowerCase();
+                        if(searchText.replace(" ","").length()==0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    foodRecycler.setVisibility(View.GONE);
+                                }
+                            });
+                            return;
+                        }
+                        ArrayList<FoodData> filteredList = new ArrayList<>();
+                        for(FoodData foodData: foodDataArrayList) {
+                            if(foodData.getName().toLowerCase().contains(searchText)) filteredList.add(foodData);
+                        }
+                        if(filteredList.size()==0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    foodRecycler.setVisibility(View.GONE);
+                                }
+                            });
+                            return;
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                foodAdapter.setFoodDataArrayList(filteredList);
+                                foodRecycler.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+                }).start();
             }
 
             @Override
