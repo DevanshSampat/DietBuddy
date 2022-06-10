@@ -36,12 +36,12 @@ public class FoodListDisplayActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(foodAdapter);
         ((TextView)findViewById(R.id.tv_category)).setText(getIntent().getStringExtra("dbName"));
-        FirebaseDatabase.getInstance().getReference("food_categories").child(getIntent().getStringExtra("dbName")).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("food_categories").child(getIntent().getStringExtra("dbName")).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 try{
                     ArrayList<String> arrayList = (ArrayList<String>) snapshot.child("list").getValue();
-                    FirebaseDatabase.getInstance().getReference("food_items").addValueEventListener(new ValueEventListener() {
+                    FirebaseDatabase.getInstance().getReference("food_items").addListenerForSingleValueEvent(new ValueEventListener() {
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {

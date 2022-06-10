@@ -103,7 +103,7 @@ public class FoodAnalysisActivity extends AppCompatActivity {
         if(getIntent().hasExtra("dbName")) {
             String prediction = getIntent().getStringExtra("dbName");
             ((TextView)findViewById(R.id.tv_name)).setText(prediction);
-            FirebaseDatabase.getInstance().getReference("food_items").addValueEventListener(new ValueEventListener() {
+            FirebaseDatabase.getInstance().getReference("food_items").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     try {
@@ -177,7 +177,7 @@ public class FoodAnalysisActivity extends AppCompatActivity {
                     while ((str = bufferedReader.readLine())!=null) arrayList.add(str.substring(str.indexOf(" ")+1));
                     String prediction = arrayList.get(index);
                     ((TextView)findViewById(R.id.tv_name)).setText(prediction);
-                    FirebaseDatabase.getInstance().getReference("food_items").addValueEventListener(new ValueEventListener() {
+                    FirebaseDatabase.getInstance().getReference("food_items").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             try {

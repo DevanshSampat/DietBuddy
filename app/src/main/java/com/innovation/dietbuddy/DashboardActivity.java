@@ -143,7 +143,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadFoodItems() {
-        FirebaseDatabase.getInstance().getReference("food_items").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("food_items").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 foodDataArrayList.clear();
@@ -171,7 +171,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadCategories() {
-        FirebaseDatabase.getInstance().getReference("food_categories").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("food_categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 categoryDataArrayList.clear();
@@ -208,33 +208,38 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode==PICK_FILE_RESULT_CODE) {
             if(resultCode==RESULT_OK) {
-                Uri uri = data.getData();
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                String mimeType = getContentResolver().getType(uri);
-                File file = new File(getFilesDir(),"image."+mimeType.substring(mimeType.indexOf("/")+1));
-                if(!file.exists()) {
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Uri uri = data.getData();
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(DashboardActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        String mimeType = getContentResolver().getType(uri);
+                        File file = new File(getFilesDir(),"image."+mimeType.substring(mimeType.indexOf("/")+1));
+                        if(!file.exists()) {
+                            try {
+                                file.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        try {
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        Intent intent = new Intent(DashboardActivity.this, FoodAnalysisActivity.class);
+                        intent.putExtra("bitmap",file.getName());
+                        startActivity(intent);
                     }
-                }
-                try {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(DashboardActivity.this, FoodAnalysisActivity.class);
-                intent.putExtra("bitmap",file.getName());
-                startActivity(intent);
+                }).start();
             }
         }super.onActivityResult(requestCode, resultCode, data);
     }
